@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - Golden Academic Bridge</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<section class="login-hero">
+  <div class="login-container">
+    <img src="images/logo.png" class="login-logo" alt="Logo">
+    <h2>Create an Account</h2>
+
+    <form id="signup-form">
+      <input type="text" id="new-username" placeholder="Username" required>
+      <input type="password" id="new-password" placeholder="Password" required>
+
+      <select id="new-role" required>
+        <option value="">Select Role</option>
+        <option value="student">Student</option>
+        <option value="teacher">Teacher</option>
+        <option value="admin">Admin</option>
+      </select>
+
+      <!-- Dynamic fields appear here -->
+      <div id="extra-fields"></div>
+
+      <button type="submit">Sign Up</button>
+    </form>
+
+    <p id="signup-message"></p>
+    <p>Already have an account? <a href="login.html">Login here</a></p>
+  </div>
+</section>
+
+<script>
+const roleSelect = document.getElementById("new-role");
+const extraFields = document.getElementById("extra-fields");
+
+roleSelect.addEventListener("change", () => {
+  const role = roleSelect.value;
+  extraFields.innerHTML = "";
+
+  if (role === "student") {
+    extraFields.innerHTML = `
+      <select id="student-class" required>
+        <option value="">Select Class</option>
+        <option value="S1">S1</option>
+        <option value="S2">S2</option>
+        <option value="S3">S3</option>
+        <option value="S4">S4</option>
+        <option value="S5">S5</option>
+        <option value="S6">S6</option>
+      </select>
+    `;
+  }
+
+  if (role === "teacher") {
+    extraFields.innerHTML = `
+      <input type="text" id="teacher-subject" placeholder="Subject You Teach" required>
+    `;
+  }
+});
+
+document.getElementById("signup-form").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const username = document.getElementById("new-username").value.trim();
+  const password = document.getElementById("new-password").value.trim();
+  const role = document.getElementById("new-role").value.trim();
+
+  let extraInfo = {};
+  if (role === "student") {
+    extraInfo.className = document.getElementById("student-class").value;
+  } else if (role === "teacher") {
+    extraInfo.subject = document.getElementById("teacher-subject").value;
+  }
+
+  const message = document.getElementById("signup-message");
+  const users = JSON.parse(localStorage.getItem("users")) || [];
+
+  if (users.find(u => u.username === username)) {
+    message.textContent = "❌ Username already exists!";
+    message.style.color = "red";
+    return;
+  }
+
+  users.push({ username, password, role, ...extraInfo });
+  localStorage.setItem("users", JSON.stringify(users));
+
+  message.textContent = "✅ Account created successfully!";
+  message.style.color = "green";
+
+  setTimeout(() => (window.location.href = "login.html"), 1500);
+});
+</script>
+
+</body>
+</html>

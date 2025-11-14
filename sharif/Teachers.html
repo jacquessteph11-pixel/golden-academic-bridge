@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teachers - House of Science</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="images/logo.png" type="image/png"><script type="module">
+  // Import Firebase SDKs
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+  // 🔥 Replace this with YOUR Firebase config from console
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  window.auth = getAuth(app); // make globally available
+  window.db = getFirestore(app);
+</script>
+
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <img src="images/logo.png" alt="HOS Logo">
+      <div>
+        <h1>House of Science (HOS)</h1>
+        <p>Kagarama Secondary School</p>
+      </div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="library.html">Library</a></li>
+        <li><a href="teachers.html" class="active">Teachers</a></li>
+        <li><a href="students.html">Students</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-text">
+      <h2>Meet Our Science Teachers</h2>
+      <p>Dedicated educators inspiring the next generation of scientists at Kagarama Secondary School.</p>
+    </div>
+  </section>
+
+  <!-- Teachers Section -->
+  <section class="teachers">
+    <h2>👩‍🏫 Our Teachers</h2>
+    <div class="teacher-gallery">
+      
+      <!-- Teacher Card -->
+      <div class="teacher-card">
+        <img src="images/teacher1.jpg" alt="Mr. jean claude">
+        <div class="teacher-info">
+          <h3>Mr. Jean claude</h3>
+          <p>Physics Teacher</p>
+          <p>Email: jeanclaude.@kagarama.edu</p>
+        </div>
+      </div>
+
+      <div class="teacher-card">
+        <img src="images/teacher2.jpg" alt="Mr. valentin">
+        <div class="teacher-info">
+          <h3>Mr. valentin</h3>
+          <p>Chemistry Teacher</p>
+          <p>Email: valentin@kagarama.edu</p>
+        </div>
+      </div>
+
+      <div class="teacher-card">
+        <img src="images/teacher3.jpg" alt="Ms. racheal">
+        <div class="teacher-info">
+          <h3>Ms. racheal</h3>
+          <p>Biology Teacher</p>
+          <p>Email: racheal@kagarama.edu</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>

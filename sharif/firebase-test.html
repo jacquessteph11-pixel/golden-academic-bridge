@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firebase Connection Test - House of Science</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #D4AF37, #C0C0C0);
+      color: #222;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .card {
+      background: rgba(255,255,255,0.8);
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      padding: 30px;
+      max-width: 600px;
+      margin: auto;
+    }
+    button {
+      background: #D4AF37;
+      color: black;
+      font-weight: bold;
+      padding: 10px 25px;
+      border-radius: 25px;
+      border: none;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #FFD700;
+      transform: scale(1.05);
+    }
+    #output {
+      margin-top: 30px;
+      text-align: left;
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      overflow-wrap: break-word;
+      font-size: 0.95em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>🔬 Firebase Connection Test</h1>
+    <p>This will verify your connection to Authentication, Firestore, and Storage.</p>
+
+    <button id="test-btn">Run Firebase Test</button>
+
+    <div id="output">
+      <p>Click the button to begin testing...</p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db, storage } from './firebase-config.js';
+    import { collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { ref, listAll } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    const output = document.getElementById('output');
+    const testBtn = document.getElementById('test-btn');
+
+    testBtn.addEventListener('click', async () => {
+      output.innerHTML = "<p>Running tests...</p>";
+
+      try {
+        // Test Auth
+        onAuthStateChanged(auth, (user) => {
+          if (user) {
+            output.innerHTML += `<p>✅ Authenticated as: ${user.email}</p>`;
+          } else {
+            output.innerHTML += `<p>⚠️ No user logged in. (Auth works but you are signed out)</p>`;
+          }
+        });
+
+        // Test Firestore
+        const testCol = collection(db, "connection-test");
+        await addDoc(testCol, { message: "Firestore works!", timestamp: new Date().toISOString() });
+        const docs = await getDocs(testCol);
+        if (!docs.empty) {
+          output.innerHTML += `<p>✅ Firestore connected — wrote & read ${docs.size} docs.</p>`;
+        }
+
+        // Test Storage
+        const listRef = ref(storage, "notes/");
+        const listResult = await listAll(listRef);
+        output.innerHTML += `<p>✅ Storage connected — found ${listResult.items.length} items in /notes.</p>`;
+
+        output.innerHTML += `<p style="color:green;font-weight:bold;">🎉 All Firebase connections succeeded!</p>`;
+      } catch (error) {
+        output.innerHTML += `<p style="color:red;">❌ Error: ${error.message}</p>`;
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
