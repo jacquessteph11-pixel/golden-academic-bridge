@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Teacher Dashboard – Golden Academic Bridge</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* --- Golden Academic Bridge Dashboard --- */
+body{font-family:'Poppins',sans-serif;background:#f9f9f9;margin:0;padding:0;}
+header{background:linear-gradient(135deg,#D4AF37,#C0C0C0);padding:15px;color:black;text-align:center;}
+.dashboard{padding:40px 20px;text-align:center;}
+.dashboard h2{color:#D4AF37;margin-bottom:30px;}
+.section-box{background:white;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,.1);
+  padding:30px;margin:25px auto;max-width:900px;}
+.section-box h3{margin-bottom:15px;color:#D4AF37;}
+label{display:inline-block;margin:5px 10px;font-weight:bold;}
+input,select,textarea{padding:8px;border:2px solid #ccc;border-radius:8px;}
+button{background:linear-gradient(135deg,#D4AF37,#C0C0C0);border:none;color:black;
+  padding:10px 20px;border-radius:25px;font-weight:bold;cursor:pointer;transition:.3s;}
+button:hover{background:linear-gradient(135deg,#FFD700,#E5E4E2);transform:scale(1.05);}
+
+/* --- Tables --- */
+.table-wrap{overflow-x:auto;margin-top:20px;}
+table{border-collapse:collapse;width:100%;min-width:700px;margin:auto;border-radius:10px;
+  overflow:hidden;box-shadow:0 5px 15px rgba(0,0,0,.1);}
+th{background:linear-gradient(135deg,#D4AF37,#C0C0C0);color:black;padding:10px;}
+td{border-top:1px solid #ddd;padding:10px;}
+tr:nth-child(even){background:#fafafa;}
+input[type="number"]{width:80px;text-align:center;}
+.total-cell{font-weight:bold;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="welcome"></h1>
+</header>
+
+<main class="dashboard">
+  <h2>🧑‍🏫 Teacher Dashboard</h2>
+
+  <!-- Upload Class List -->
+  <div class="section-box">
+    <h3>📄 Upload Class List (CSV)</h3>
+    <p>Upload a CSV file with columns: <b>Student Name, Class</b></p>
+    <input type="file" id="class-file" accept=".csv">
+    <button id="upload-class">Upload List</button>
+    <div class="table-wrap">
+      <table id="class-table">
+        <thead><tr><th>Student Name</th><th>Class</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Marks Section -->
+  <div class="section-box">
+    <h3>📊 Enter Student Marks</h3>
+    <label>Class:
+      <select id="class-select">
+        <option value="S1">S1</option><option value="S2">S2</option>
+        <option value="S3">S3</option><option value="S4">S4</option>
+        <option value="S5">S5</option><option value="S6">S6</option>
+      </select>
+    </label>
+    <label>Subject: <input type="text" id="subject" readonly></label>
+    <label>Test Name: <input type="text" id="test-name" placeholder="Test 1"></label>
+    <label>Out of: <input type="number" id="out-of" placeholder="50"></label>
+    <label>Exam Out of: <input type="number" id="exam-out-of" placeholder="100"></label>
+    <div class="table-wrap">
+      <table id="marks-table">
+        <thead>
+          <tr><th>Student</th><th id="test-head">Test</th><th id="exam-head">Exam</th><th>Total (%)</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <button id="save-marks">💾 Save Marks</button>
+  </div>
+
+  <button id="logout">Logout</button>
+</main>
+
+<script>
+/* --- Load teacher info --- */
+const user = JSON.parse(localStorage.getItem("loggedInUser"));
+if (!user || user.role !== "teacher") window.location.href = "login.html";
+document.getElementById("welcome").textContent = `Welcome, ${user.username}!`;
+document.getElementById("subject").value = user.subject || "Not Assigned";
+
+/* --- Load data --- */
+let allClassLists = JSON.parse(localStorage.getItem("allClassLists")) || {};
+let marksData = JSON.parse(localStorage.getItem("marksData")) || [];
+
+/* --- Upload Class List --- */
+document.getElementById("upload-class").onclick = () => {
+  const file = document.getElementById("class-file").files[0];
+  if (!file) return alert("Please choose a CSV file!");
+  const reader = new FileReader();
+  reader.onload = e => {
+    const lines = e.target.result.split("\n").filter(l => l.trim());
+    const newList = {};
+    lines.forEach(l => {
+      const [name, cls] = l.split(",").map(x => x.trim());
+      if (name && cls) {
+        if (!newList[cls]) newList[cls] = [];
+        newList[cls].push({ name, cls });
+      }
+    });
+    Object.keys(newList).forEach(cls => {
+      allClassLists[cls] = newList[cls];
+    });
+    localStorage.setItem("allClassLists", JSON.stringify(allClassLists));
+    renderClassList();
+    loadMarksTable(); // refresh table automatically
+    alert("✅ Class list uploaded successfully!");
+  };
+  reader.readAsText(file);
+};
+
+function renderClassList() {
+  const tbody = document.querySelector("#class-table tbody");
+  tbody.innerHTML = "";
+  Object.keys(allClassLists).forEach(cls => {
+    allClassLists[cls].forEach(s => {
+      const row = document.createElement("tr");
+      row.innerHTML = `<td>${s.name}</td><td>${s.cls}</td>`;
+      tbody.appendChild(row);
+    });
+  });
+}
+renderClassList();
+
+/* --- Marks Table --- */
+const tbody = document.querySelector("#marks-table tbody");
+function loadMarksTable() {
+  const cls = document.getElementById("class-select").value;
+  const subject = document.getElementById("subject").value;
+  const test = document.getElementById("test-name").value || "Test";
+  const outOf = parseFloat(document.getElementById("out-of").value) || 50;
+  const examOut = parseFloat(document.getElementById("exam-out-of").value) || 100;
+  const testHead = document.getElementById("test-head");
+  const examHead = document.getElementById("exam-head");
+
+  testHead.textContent = `${test} / ${outOf}`;
+  examHead.textContent = `Exam / ${examOut}`;
+  tbody.innerHTML = "";
+
+  const students = allClassLists[cls] || [];
+  students.forEach(st => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${st.name}</td>
+      <td><input type="number" class="test-mark" min="0" max="${outOf}"></td>
+      <td><input type="number" class="exam-mark" min="0" max="${examOut}"></td>
+      <td class="total-cell">0</td>`;
+    tbody.appendChild(row);
+  });
+}
+document.getElementById("class-select").addEventListener("change", loadMarksTable);
+document.getElementById("test-name").addEventListener("input", loadMarksTable);
+document.getElementById("out-of").addEventListener("input", loadMarksTable);
+document.getElementById("exam-out-of").addEventListener("input", loadMarksTable);
+loadMarksTable();
+
+function calcTotals() {
+  const outOf = parseFloat(document.getElementById("out-of").value) || 1;
+  const examOut = parseFloat(document.getElementById("exam-out-of").value) || 1;
+  document.querySelectorAll("#marks-table tbody tr").forEach(r => {
+    const t = parseFloat(r.querySelector(".test-mark").value) || 0;
+    const e = parseFloat(r.querySelector(".exam-mark").value) || 0;
+    const cont = (t / outOf) * 50, ex = (e / examOut) * 50;
+    r.querySelector(".total-cell").textContent = Math.round(cont + ex);
+  });
+}
+tbody.addEventListener("input", calcTotals);
+
+/* --- Save Marks --- */
+document.getElementById("save-marks").onclick = () => {
+  const cls = document.getElementById("class-select").value;
+  const subject = document.getElementById("subject").value;
+  const test = document.getElementById("test-name").value || "Test";
+  tbody.querySelectorAll("tr").forEach(r => {
+    const student = r.children[0].textContent;
+    const t = parseFloat(r.querySelector(".test-mark").value) || 0;
+    const e = parseFloat(r.querySelector(".exam-mark").value) || 0;
+    const total = parseFloat(r.querySelector(".total-cell").textContent) || 0;
+    const existing = marksData.find(m => m.student === student && m.subject === subject && m.className === cls);
+    if (existing) { existing[test] = t; existing.exam = e; existing.total = total; }
+    else marksData.push({ student, className: cls, subject, [test]: t, exam: e, total });
+  });
+  localStorage.setItem("marksData", JSON.stringify(marksData));
+  alert("✅ Marks saved successfully!");
+};
+
+/* --- Logout --- */
+document.getElementById("logout").onclick = () => {
+  localStorage.removeItem("loggedInUser");
+  window.location.href = "login.html";
+};
+</script>
+</body>
+</html>

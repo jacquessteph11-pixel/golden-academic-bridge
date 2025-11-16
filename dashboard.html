@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - House of Science</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1 id="welcome-text"></h1>
+  </header>
+
+  <main>
+    <button id="logout">Logout</button>
+  </main>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+
+    if (!user) {
+      window.location.href = "login.html";
+    } else {
+      document.getElementById("welcome-text").textContent =
+        `Hello, ${user.username}! You are logged in as a ${user.role}.`;
+    }
+
+    document.getElementById("logout").addEventListener("click", () => {
+      localStorage.removeItem("loggedInUser");
+      alert("You have logged out.");
+      window.location.href = "login.html";
+    });
+  </script>
+</body>
+</html>

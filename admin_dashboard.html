@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - GAB</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1 id="welcome"></h1>
+</header>
+
+<main class="dashboard">
+  <h2>⚙️ Admin Panel</h2>
+  <h3>All Registered Users</h3>
+  <table id="users-table" border="1" cellpadding="10" style="margin:auto;">
+    <thead>
+      <tr><th>Username</th><th>Role</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <button id="logout">Logout</button>
+</main>
+
+<script>
+const user = JSON.parse(localStorage.getItem("loggedInUser"));
+if (!user || user.role !== "admin") window.location.href = "login.html";
+document.getElementById("welcome").textContent = `Welcome, ${user.username}!`;
+
+const users = JSON.parse(localStorage.getItem("users")) || [];
+const tbody = document.querySelector("#users-table tbody");
+users.forEach(u => {
+  const row = document.createElement("tr");
+  row.innerHTML = `<td>${u.username}</td><td>${u.role}</td>`;
+  tbody.appendChild(row);
+});
+
+document.getElementById("logout").addEventListener("click", () => {
+  localStorage.removeItem("loggedInUser");
+  window.location.href = "login.html";
+});
+</script>
+
+</body>
+</html>

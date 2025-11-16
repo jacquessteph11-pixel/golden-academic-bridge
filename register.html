@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - House of Science</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="register-box">
+    <h2>📝 Register - House of Science</h2>
+
+    <input type="text" id="username" placeholder="Username">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <select id="role">
+      <option value="">Select Role</option>
+      <option value="student">Student</option>
+      <option value="teacher">Teacher</option>
+    </select>
+    <button id="register-btn">Register</button>
+    <button id="google-btn">Continue with Google</button>
+    <p>Already have an account? <a href="login.html">Login here</a></p>
+  </div>
+
+  <script type="module">
+    import { auth, db } from './firebase.js';
+    import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { setDoc, doc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const registerBtn = document.getElementById("register-btn");
+    const googleBtn = document.getElementById("google-btn");
+
+    registerBtn.addEventListener("click", async () => {
+      const username = document.getElementById("username").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const role = document.getElementById("role").value;
+
+      if (!username || !email || !password || !role) {
+        alert("⚠️ Please fill all fields");
+        return;
+      }
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        await setDoc(doc(db, "users", user.uid), {
+          username,
+          email,
+          role
+        });
+
+        alert("✅ Registration successful!");
+        window.location.href = "login.html";
+
+      } catch (error) {
+        if (error.code === "auth/email-already-in-use") {
+          alert("⚠️ Email is already in use. Please login or use another email.");
+        } else {
+          alert("❌ Registration failed: " + error.message);
+        }
+      }
+    });
+
+    googleBtn.addEventListener("click", async () => {
+      const provider = new GoogleAuthProvider();
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+
+        // Save in Firestore if not exists
+        await setDoc(doc(db, "users", user.uid), {
+          username: user.displayName || "Google User",
+          email: user.email,
+          role: "student" // default role
+        });
+
+        alert("✅ Signed in with Google!");
+        localStorage.setItem("loggedInUser", JSON.stringify({
+          username: user.displayName || "Google User",
+          email: user.email,
+          role: "student"
+        }));
+
+        window.location.href = "dashboard.html";
+
+      } catch (error) {
+        alert("❌ Google sign-in failed: " + error.message);
+      }
+    });
+  </script>
+</body>
+</html>

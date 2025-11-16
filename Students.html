@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard - HOS</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="images/logo.png" type="image/png">
+
+  <!-- ✅ Firebase Initialization -->
+  <script type="module">
+    // Import Firebase SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { 
+      getAuth, 
+      onAuthStateChanged, 
+      signOut 
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      getDoc 
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    // ✅ Your Firebase config (from login page)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCUZQOrUksAU7BaMkGOER4GwgzIe8Rnd_8",
+      authDomain: "houseofscienceweb.firebaseapp.com",
+      projectId: "houseofscienceweb",
+      storageBucket: "houseofscienceweb.appspot.com",
+      messagingSenderId: "601260057411",
+      appId: "1:601260057411:web:97c90b7bf2bc5e480e85f6",
+      measurementId: "G-LFJK181XYE"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // 🔹 When the page loads, check if user is logged in
+    window.addEventListener("DOMContentLoaded", () => {
+      const userNameElement = document.getElementById("studentName");
+
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          // Not logged in — redirect to login page
+          window.location.href = "login.html";
+        } else {
+          // Logged in ✅
+          try {
+            const docRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(docRef);
+
+            if (userDoc.exists()) {
+              const data = userDoc.data();
+              userNameElement.textContent = data.username || user.email;
+            } else {
+              userNameElement.textContent = user.email;
+            }
+          } catch (error) {
+            console.error("Error fetching user data:", error);
+            userNameElement.textContent = user.email;
+          }
+        }
+      });
+    });
+
+    // 🔹 Logout functionality
+    window.logoutUser = async function () {
+      try {
+        await signOut(auth);
+        alert("You have logged out successfully.");
+        window.location.href = "login.html";
+      } catch (error) {
+        console.error("Logout error:", error);
+      }
+    };
+  </script>
+</head>
+
+<body>
+
+  <!-- Header Section -->
+  <header>
+    <div class="logo">
+      <img src="images/logo.png" alt="HOS Logo">
+      <div>
+        <h1>House of Science (HOS)</h1>
+        <p>Kagarama Secondary School</p>
+      </div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="student-dashboard.html" class="active">Dashboard</a></li>
+        <li><a href="library.html">Library</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="#" onclick="logoutUser()">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero Section / Welcome -->
+  <section class="hero">
+    <div class="hero-text">
+      <h2>Welcome, <span id="studentName">Loading...</span> 👋</h2>
+      <p>Explore resources, check your courses, and discover amazing science books.</p>
+    </div>
+  </section>
+
+  <!-- Quick Links for Student -->
+  <section class="student-links">
+    <h2>Quick Access</h2>
+    <div class="links-container">
+      <a href="library.html" class="btn">Library</a>
+      <a href="events.html" class="btn">Upcoming Events</a>
+      <a href="teachers.html" class="btn">Teacher Contacts</a>
+      <a href="students.html" class="btn">Student Resources</a>
+    </div>
+  </section>
+
+  <!-- Featured Books -->
+  <section class="featured-books">
+    <h2>📚 Recommended Books</h2>
+    <div class="book-gallery">
+      <div class="book-card">
+        <img src="images/book1.jpg" alt="Physics Fundamentals">
+        <div class="book-info">
+          <h3>Physics Fundamentals</h3>
+          <p>Explore the forces and motion that shape our world.</p>
+          <a href="library.html" class="btn">Read More</a>
+        </div>
+      </div>
+      <div class="book-card">
+        <img src="images/book2.jpg" alt="Modern Chemistry">
+        <div class="book-info">
+          <h3>Modern Chemistry</h3>
+          <p>Discover the secrets behind chemical reactions and compounds.</p>
+          <a href="library.html" class="btn">Read More</a>
+        </div>
+      </div>
+      <div class="book-card">
+        <img src="images/astronomy.jpg" alt="Astronomy Wonders">
+        <div class="book-info">
+          <h3>Astronomy Wonders</h3>
+          <p>Explore the stars, planets, and galaxies beyond our world.</p>
+          <a href="library.html" class="btn">Read More</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-info">
+        <img src="images/logo.png" alt="HOS Logo" class="footer-logo">
+        <p>House of Science (HOS)<br>Kagarama Secondary School</p>
+        <p>Email: info@kagarama.edu | Phone: +250 123 456 789</p>
+      </div>
+
+      <div class="footer-links">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="library.html">Library</a></li>
+          <li><a href="teachers.html">Teachers</a></li>
+          <li><a href="events.html">Events</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-social">
+        <h3>Follow Us</h3>
+        <div class="social-icons">
+          <a href="#"><img src="images/facebook.png" alt="Facebook" /></a>
+          <a href="#"><img src="images/twitter.png" alt="Twitter" /></a>
+          <a href="#"><img src="images/instagram.png" alt="Instagram" /></a>
+        </div>
+      </div>
+    </div>
+    <p class="footer-copy">© 2025 House of Science - Kagarama Secondary School. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>
