@@ -75,3 +75,4 @@ searchBar.addEventListener("input", (e) => {
 document.addEventListener("DOMContentLoaded", () => {
   fetchBooks(currentTopic);
 });
+
