@@ -3,34 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>House of Science Library</title>
-<link rel="stylesheet" href="library.css"><script type="module">
-  // Import Firebase SDKs
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-  // 🔥 Replace this with YOUR Firebase config from console
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  window.auth = getAuth(app); // make globally available
-  window.db = getFirestore(app);
-</script>
-
+<title>Library – Golden Academic Bridge</title>
+<link rel="stylesheet" href="library.css">
 </head>
+
 <body>
 
 <header>
-    <h1>📚 House of Science Library</h1>
+    <h1>📚 Golden Academic Bridge Library</h1>
     <nav>
         <a href="index.html">Home</a>
         <a href="library.html" class="active">Library</a>
@@ -38,26 +18,33 @@
         <a href="students.html">Students</a>
         <a href="contact.html">Contact</a>
     </nav>
-</header><main>
-  <section class="library-header">
-    <h2>📚 Explore the House of Science Library</h2>
-    <input type="text" id="searchBar" placeholder="Search for a book or author...">
-  </section>
-
-  <section class="book-gallery" id="book-gallery">
-    <!-- Book cards will be dynamically inserted here -->
-  </section>
-</main>
-
+</header>
 
 <main>
-    <section class="book-gallery" id="book-gallery">
-        <!-- Book cards will be dynamically inserted here -->
+
+    <!-- Search + Filter Section -->
+    <section class="search-area">
+        <input type="text" id="searchInput" placeholder="Search books…">
+
+        <select id="categoryFilter">
+            <option value="all">All Categories</option>
+            <option value="Physics">Physics</option>
+            <option value="Chemistry">Chemistry</option>
+            <option value="Biology">Biology</option>
+            <option value="Mathematics">Mathematics</option>
+            <option value="Astronomy">Astronomy</option>
+        </select>
     </section>
+
+    <!-- Display Books -->
+    <section class="book-gallery" id="book-gallery">
+        <!-- Books will be dynamically added by library.js -->
+    </section>
+
 </main>
 
 <footer>
-    <p>&copy; 2025 House of Science - Kagarama Secondary School</p>
+    <p>© 2025 Golden Academic Bridge — All Rights Reserved</p>
 </footer>
 
 <script src="library.js"></script>
